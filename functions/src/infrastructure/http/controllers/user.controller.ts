@@ -3,11 +3,13 @@ import { FirestoreUserRepository } from '../../database/firestore-user.repositor
 import { CheckUserUseCase } from '../../../application/user/check-user.use-case';
 import { CreateUserUseCase } from '../../../application/user/create-user.use-case';
 import { ProfileUserUseCase } from '../../../application/user/profile-user.use-case';
+import { SearchUserUseCase } from '../../../application/user/search-user.use-case';
 
 const userRepository = new FirestoreUserRepository();
 const checkUserUseCase = new CheckUserUseCase(userRepository);
 const createUserUseCase = new CreateUserUseCase(userRepository);
 const profileUserUseCase = new ProfileUserUseCase(userRepository);
+const searchUserUseCase = new SearchUserUseCase(userRepository);
 
 export const checkUser = async (req: Request, res: Response) => {
    try {
@@ -70,3 +72,20 @@ export const profileUser = async (req: Request, res: Response) => {
       res.status(500).json({ message });
    }
 };
+
+export const searchUser = async (req: Request, res: Response) => {
+   try {
+      const { term } = req.query;
+      if (!term || typeof term !== 'string') {
+         res.status(400).json({ message: 'Search term is required' });
+         return;
+      }
+
+      const users = await searchUserUseCase.execute(term);
+      res.status(200).json(users);
+   } catch (error) {
+      console.error(error);
+      const message = error instanceof Error ? error.message : 'Error retrieving user profile';
+      res.status(500).json({ message });
+   }
+}
