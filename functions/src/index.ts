@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions';
 import express from 'express';
 import cors from 'cors';
+import { userRoutes } from './infrastructure/http/routes/user.routes';
 
 const app = express();
 
@@ -12,6 +13,8 @@ app.use(express.json());
 app.get('health', (req, res) => {
    res.status(200).send('OK');
 });
+app.use('/v1/users', userRoutes);
+
 
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
    console.error(err);
